@@ -1,0 +1,6 @@
+
+category | instance | component    | name       | value | description                  | default_value | updated | scope | is_dynamic |
++----------+----------+--------------+------------+-------+------------------------------+---------------+---------+-------+------------+
+| Advanced | DEFAULT  | AgentManager | ha.workers | 1     | Number of ha worker threads. | 5             | NULL    | NULL  |          0 
+
+insert into configuration (category, instance, component, name, value, description, default_value, updated, scope, is_dynamic) values ('Advanced', 'DEFAULT', 'AgentManager', 'force.ha','true','force ha','false',NULL,NULL,0);

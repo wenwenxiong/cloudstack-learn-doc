@@ -1,0 +1,36 @@
+ (catalina-exec-11:ctx-67e8632c ctx-e157cec7) (userId=2 accountId=2 sessionId=244403D5A556E0905CA25BDDD9413BA6) 192.168.0.10 --
+ GET command=migrateVirtualMachine&hostid=3cea6bac-1157-4cf4-873a-c86769ad0d48&virtualmachineid=588e92f0-5285-49ae-88de-884326319f34&response=json&_=1447810905796 
+200 {"migratevirtualmachineresponse":{"jobid":"0850fc89-722d-4f82-a006-dea5b41f693d"}}
+2015-11-17 20:41:36,751 INFO  [a.c.c.a.ApiServer] (catalina-exec-9:ctx-e6e8dfc2 ctx-49f10534) (userId=2 accountId=2 sessionId=244403D5A556E0905CA25BDDD9413BA6) 192.168.0.10
+ -- GET command=queryAsyncJobResult&jobId=0850fc89-722d-4f82-a006-dea5b41f693d&response=json&_=1447810909106 
+200 {"queryasyncjobresultresponse":{"accountid":"eadbc76a-7ed3-11e5-8952-123456009abc","userid":"eadbcf1c-7ed3-11e5-8952-123456009abc",
+"cmd":"org.apache.cloudstack.api.command.admin.vm.MigrateVMCmd","jobstatus":0,"jobprocstatus":0,"jobresultcode":0,"created":"2015-11-17T20:41:33-0500",
+"jobid":"0850fc89-722d-4f82-a006-dea5b41f693d"}}
+2015-11-17 20:41:39,869 INFO  [a.c.c.a.ApiServer] (catalina-exec-13:ctx-f35d9396 ctx-e9dd06bc) (userId=2 accountId=2 sessionId=244403D5A556E0905CA25BDDD9413BA6) 192.168.0.10 
+-- GET command=queryAsyncJobResult&jobId=0850fc89-722d-4f82-a006-dea5b41f693d&response=json&_=1447810912105 
+200 {"queryasyncjobresultresponse":{"accountid":"eadbc76a-7ed3-11e5-8952-123456009abc","userid":"eadbcf1c-7ed3-11e5-8952-123456009abc",
+"cmd":"org.apache.cloudstack.api.command.admin.vm.MigrateVMCmd","jobstatus":0,"jobprocstatus":0,"jobresultcode":0,"created":"2015-11-17T20:41:33-0500",
+"jobid":"0850fc89-722d-4f82-a006-dea5b41f693d"}}
+2015-11-17 20:41:42,697 INFO  [a.c.c.a.ApiServer] (catalina-exec-15:ctx-80892f30 ctx-f94867d6) (userId=2 accountId=2 sessionId=244403D5A556E0905CA25BDDD9413BA6) 192.168.0.10
+ -- GET command=queryAsyncJobResult&jobId=0850fc89-722d-4f82-a006-dea5b41f693d&response=json&_=1447810915105 200 
+{"queryasyncjobresultresponse":{"accountid":"eadbc76a-7ed3-11e5-8952-123456009abc","userid":"eadbcf1c-7ed3-11e5-8952-123456009abc",
+"cmd":"org.apache.cloudstack.api.command.admin.vm.MigrateVMCmd","jobstatus":0,"jobprocstatus":0,"jobresultcode":0,"created":"2015-11-17T20:41:33-0500",
+"jobid":"0850fc89-722d-4f82-a006-dea5b41f693d"}}
+2015-11-17 20:41:45,719 INFO  [a.c.c.a.ApiServer] (catalina-exec-16:ctx-999e2849 ctx-2517a31c) (userId=2 accountId=2 sessionId=244403D5A556E0905CA25BDDD9413BA6) 192.168.0.10 
+-- GET command=queryAsyncJobResult&jobId=0850fc89-722d-4f82-a006-dea5b41f693d&response=json&_=1447810918105 200 
+{"queryasyncjobresultresponse":{"accountid":"eadbc76a-7ed3-11e5-8952-123456009abc","userid":"eadbcf1c-7ed3-11e5-8952-123456009abc",
+"cmd":"org.apache.cloudstack.api.command.admin.vm.MigrateVMCmd","jobstatus":1,"jobprocstatus":0,"jobresultcode":0,"jobresulttype":"object",
+"jobresult":{"virtualmachine":{"id":"588e92f0-5285-49ae-88de-884326319f34","name":"Admin-Test-Web-1","displayname":"Admin-Test-Web-1","account":"admin",
+"domainid":"26da4378-7ed3-11e5-8952-123456009abc","domain":"ROOT","created":"2015-11-04T20:58:12-0500","state":"Running","haenable":false,
+"zoneid":"ab8e3972-c80d-41a8-85a4-e086e8aef25d","zonename":"sky-test-zone1","hostid":"3cea6bac-1157-4cf4-873a-c86769ad0d48","hostname":"host72.gzoc.lib",
+"templateid":"a4bcf01c-72fa-49f9-8856-d0ef8a4b4ea8","templatename":"CentOS7.qcow2","templatedisplaytext":"CentOS7","passwordenabled":false,
+"serviceofferingid":"20e16984-003e-43f2-81fc-9a6498af9414","serviceofferingname":"Small Instance","diskofferingid":"f0086010-be8d-4b71-8c56-a61afd17b914",
+"diskofferingname":"Medium","cpunumber":1,"cpuspeed":500,"memory":512,"cpuused":"0.67%","networkkbsread":37733,"networkkbswrite":54411,"diskkbsread":188,
+"diskkbswrite":229564,"diskioread":10,"diskiowrite":51014,"guestosid":"d2f14bfc-7ed3-11e5-8952-123456009abc","rootdeviceid":0,"rootdevicetype":"ROOT",
+"securitygroup":[],"nic":[{"id":"33e7aab1-0e42-4dd9-b78f-6e5d38beee48","networkid":"c179c92d-90dd-4328-9346-d3e60e24ea77","networkname":"Web-Tier",
+"netmask":"255.255.255.0","gateway":"10.0.0.254","ipaddress":"10.0.0.160","isolationuri":"vlan://1212","broadcasturi":"vlan://1212","traffictype":"Guest",
+"type":"Isolated","isdefault":true,"macaddress":"02:00:52:e7:00:01"}],"hypervisor":"KVM","instancename":"i-2-35-VM","tags":[],"affinitygroup":[],
+"displayvm":true,"isdynamicallyscalable":false,"ostypeid":246}},"created":"2015-11-17T20:41:33-0500","jobid":"0850fc89-722d-4f82-a006-dea5b41f693d"}}
+
+#################
+VirtualMachineManagerImpl.orchestrateMigrate(com.cloud.vm.VmWorkMigrate)

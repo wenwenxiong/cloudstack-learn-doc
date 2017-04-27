@@ -1,0 +1,79 @@
+﻿cloudstack对VM的高可用有两种方式
+（1） VM ha：由cloudstack management间隔发送pingTask收集host机器上VM的state信息，更新数据库表vm_instance的power_state字段，之后通过消息通知机制MessageBusBase发行该主题，订阅者比较数据库表vm_instance的power_state和state字段，若果power_state为PowerOff或PowerReportMissing，而state为Starting|Stopping|Running|Stopped|Migrating中一种，则调用HighAvailabilityManagerImpl的scheduleRestart(VMInstanceVO vm, boolean investigate)方法来重启VM。
+
+
+
+
+
+
+图1、VM ha 执行流程图
+
+
+
+（2）host ha：由cloudstack management间隔发送MonitorTask对ping超时的host，查询其状态，如果状态不为Disabled，Maintenance，ErrorInMaintenance（异常断开连接），调用HighAvailabilityManagerImpl的scheduleRestartForVmsOnHost(final HostVO host, boolean investigate)来重启该host上的所有VM。
+
+
+
+
+
+
+
+
+AgentManagerImpl类中有一个
+private final ConcurrentHashMap<Long, Long> _pingMap = new ConcurrentHashMap<Long, Long>(10007);
+
+在处理host的主动连接时，对于host 类型不为TrafficMonitor和SecondaryStorage的host
+_pingMap中保存着hostid和连接时的当前时间
+
+_pingMap.put(host.getId(), InaccurateClock.getTimeInSeconds());
+
+在处理host的主动断开连接时
+
+_pingMap.remove(agentId);
+
+////
+在AgentManagerImpl组件启动时(start方法)
+
+_monitorExecutor.scheduleWithFixedDelay(new MonitorTask(), PingInterval.value(), PingInterval.value(), TimeUnit.SECONDS);
+
+_monitorExecutor间隔指定时间调度执行 MonitorTask任务
+
+ MonitorTask任务内容为
+（1）根据当前时间计算出需要进行ping检测的hostid
+ List<Long> agentsBehind = new ArrayList<Long>();
+ long cutoffTime = InaccurateClock.getTimeInSeconds() - getTimeout();
+ for (Map.Entry<Long, Long> entry : _pingMap.entrySet()) {
+   if (entry.getValue() < cutoffTime) {
+       agentsBehind.add(entry.getKey());
+       }
+   }
+
+ if (agentsBehind.size() > 0) {
+     s_logger.info("Found the following agents behind on ping: " + agentsBehind);
+     }
+
+ return agentsBehind;
+（2）对于每一个需要进行ping检测的hostid，从host数据库表查询其state
+
+2.1 若状态为Disabled，Maintenance，ErrorInMaintenance ，则断开host的连接
+
+if (resourceState == ResourceState.Disabled || resourceState == ResourceState.Maintenance || resourceState == ResourceState.ErrorInMaintenance) {
+                            /*
+                             * Host is in non-operation state, so no
+                             * investigation and direct put agent to
+                             * Disconnected
+                             */
+ status_logger.debug("Ping timeout but host " + agentId + " is in resource state of " + resourceState + ", so no investigation");
+   disconnectWithoutInvestigation(agentId, Event.ShutdownRequested);
+}
+
+2.2 如果state不为上述三种（异常断开连接），但host类型为ConsoleProxy，SecondaryStorageVM，SecondaryStorageCmdExecutor，不调查检测，关闭连接
+
+2.3对host调查检测，并发出告警事件。并对host上VM生成调用HighAvailabilityManagerImpl的scheduleRestartForVmsOnHost来重启host上的VM，scheduleRestartForVmsOnHost对每一个VM调用scheduleRestart。
+
+#######
+HighAvailabilityManagerImpl的scheduleRestart会在数据库表op_ha_work中插入一条VM的ha类型的记录，然后唤醒WorkerThread来处理。
+
+HighAvailabilityManagerImpl组件在configure根据数据库表configuration的记录ha.workers的值（5）来构建5个WorkerThread。WorkerThread取op_ha_work的记录，对WorkType.HA
+类型的记录执行restart(work)该函数会重启VM。
+

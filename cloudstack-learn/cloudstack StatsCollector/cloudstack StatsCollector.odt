@@ -1,0 +1,34 @@
+﻿    cloudstack的StatsCollector中具有两个调度线程池ScheduledExecutorService，在StatsCollector中init()中一个名为_executor 的线程池创建4个线程执行HostCollector
+、VmStatsCollector、StorageCollector、AutoScaleMonitor、VmDiskStatsTask；一个名为_diskStatsUpdateExecutor的调度线程池创建一个线程执行VmDiskStatsUpdaterTask。线程的间隔
+调用时间是从数据库表configuration中读取。
+
+
+
+
+
+下面说明HostCollector、VmStatsCollector、StorageCollector、AutoScaleMonitor、VmDiskStatsTask、VmDiskStatsUpdaterTask的任务。
+
+HostCollector：
+  发送GetHostStatsCommand给agent，将得到的HostStatsEntry存入字段_hostStats中。
+  发送GetGPUStatsCommand给agent,得到的groupDetails更新host_gpu_groups、vgpu_types表。
+
+  host_gpu_groups中的所有hostId存入字段hostIds。
+
+VmStatsCollector：
+  发给GetVmStatsCommand给每台agent，收集关于每台host机器所有运行的客户VM信息，得到的VmStatById插入或更新字段_VmStats。
+
+StorageCollector:
+  从数据库表image_storage中取出二级存储的url，根据type的类型zone则由dcId查找到ssvm，类型为region则从所有ssvm中取出一个ssvm。向ssvm发送GetStorageStatsCommand,将结果保存在字段_storageStats中。
+
+  从数据库表storage_pool、storage_pool_host_ref中取出up状态的一级存储的host_id。向host_id所指的机器发送GetStorageStatsCommand,将得到的结果保存在字段_storagePoolStats中。若发现结果中capacityBytes值与现有的storage_pool中字段capacityBytes不同，则更新storage_pool表。
+
+AutoScaleMonitor：
+  从数据库表autoscale_vmgroups中查找以id为标志的当前VM数量与min_members相比。若current Vm数量小于min_members，则在该vm_group创建新的vm。达到min_members数量。
+  向vm所在的host发送PerformanceMonitorCommand收集内存等性能数据。
+
+VmDiskStatsTask：
+   发送GetVmDiskStatsCommand给vm所在的host，将得到的结果，加锁并更新VM的disk相关表vm_disk_statistics的current_io_read,current_io_write,current_bytes_read,current_bytes_write,net_io_read,net_io_write,net_bytes_read,net_bytes_write字段。
+
+VmDiskStatsUpdaterTask：
+  更新数据库表vm_disk_statistics表agg_io_read，agg_io_write，agg_bytes_read，agg_bytes_write字段。
+agg_io_read=current_io_read +  net_io_read。其它字段同理。
